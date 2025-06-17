@@ -1,0 +1,592 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    background: linear-gradient(135deg, #0C4DA1 0%, #4FA0D8 100%);
+    overflow: hidden;
+    cursor: crosshair;
+    font-family: Arial, sans-serif;
+}
+
+/* Performance optimizations */
+.clouds {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    will-change: transform; /* Enable hardware acceleration */
+}
+
+.cloud {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+    opacity: 1;
+    will-change: transform;
+    transform: translateZ(0); /* Force hardware acceleration */
+}
+
+.cloud.vaporized {
+    animation: vaporize 1s ease-out forwards !important;
+}
+
+@keyframes vaporize {
+    0% {
+        opacity: 0.6;
+        transform: scale(1) translateZ(0);
+        filter: blur(0px);
+        background: rgba(255, 255, 255, 0.8);
+    }
+    25% {
+        opacity: 0.8;
+        transform: scale(1.2) translateZ(0);
+        filter: blur(1px);
+        background: rgba(255, 200, 100, 0.9);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.5) translateZ(0);
+        filter: blur(3px);
+        background: rgba(255, 150, 50, 0.7);
+    }
+    75% {
+        opacity: 0.3;
+        transform: scale(1.8) translateZ(0);
+        filter: blur(5px);
+        background: rgba(255, 100, 0, 0.5);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(2.2) translateZ(0);
+        filter: blur(8px);
+        background: rgba(255, 50, 0, 0.2);
+    }
+}
+
+.moving-object {
+    position: absolute;
+    z-index: 15;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+.airplane {
+    width: 60px;
+    height: 30px;
+    left: -80px;
+}
+
+.airplane:before {
+    content: '🗂️';
+    font-size: 45px;
+    position: absolute;
+    top: -10px;
+    left: 10px;
+}
+
+.airplane.crashed {
+    animation: crash 1s ease-out forwards;
+}
+
+.robot {
+    width: 50px;
+    height: 50px;
+    top: 70%;
+    left: -60px;
+}
+
+.robot:before {
+    content: '🤖';
+    font-size: 40px;
+    position: absolute;
+    top: -5px;
+    left: 5px;
+}
+
+.robot.destroyed {
+    animation: robot-explode 1s ease-out forwards;
+}
+
+@keyframes crash {
+    0% {
+        transform: rotate(0deg) scale(1) translateZ(0);
+        opacity: 1;
+    }
+    50% {
+        transform: rotate(180deg) scale(1.2) translateZ(0);
+        opacity: 0.8;
+    }
+    100% {
+        transform: rotate(360deg) scale(0.5) translateZ(0);
+        opacity: 0;
+    }
+}
+
+@keyframes robot-explode {
+    0% {
+        transform: rotate(0deg) scale(1) translateZ(0);
+        opacity: 1;
+    }
+    25% {
+        transform: rotate(90deg) scale(1.3) translateZ(0);
+        opacity: 0.9;
+    }
+    50% {
+        transform: rotate(180deg) scale(1.5) translateZ(0);
+        opacity: 0.7;
+    }
+    75% {
+        transform: rotate(270deg) scale(1.2) translateZ(0);
+        opacity: 0.4;
+    }
+    100% {
+        transform: rotate(360deg) scale(0.3) translateZ(0);
+        opacity: 0;
+    }
+}
+
+.score {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    z-index: 30;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid #F5C100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+.score.power-ready {
+    border-color: white;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    animation: power-pulse 2s infinite;
+}
+
+.score.power-cooldown {
+    border-color: red;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.score.power-charging {
+    border-color: #ff4444;
+    animation: charge-up 20s linear forwards;
+}
+
+@keyframes power-pulse {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+        transform: scale(1.05);
+    }
+}
+
+@keyframes charge-up {
+    0% { border-color: #ff4444; }
+    100% { border-color: #44ff44; }
+}
+
+.power-image {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    background-image: url('../images/guigui_small.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 100;
+    display: none;
+    border-radius: 50%;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.8);
+    top: 50%;
+    left: 50%;
+}
+
+.power-image.active {
+    display: block;
+    animation: power-drop 3s ease-out forwards;
+}
+
+@keyframes power-drop {
+    0% {
+        transform: translate(-50%, -150vh) rotate(0deg) scale(0.5);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+        transform: translate(-50%, -50%) rotate(180deg) scale(1);
+    }
+    40% {
+        transform: translate(-50%, -50%) rotate(360deg) scale(1.2);
+    }
+    60% {
+        transform: translate(-50%, -50%) rotate(540deg) scale(1.5);
+    }
+    80% {
+        transform: translate(-50%, -50%) rotate(720deg) scale(2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(900deg) scale(0);
+        opacity: 0;
+    }
+}
+
+.screen-flash {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 30%, rgba(255,255,255,0) 70%);
+    z-index: 99;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.screen-flash.active {
+    animation: flash-screen 1s ease-out forwards;
+}
+
+@keyframes flash-screen {
+    0% { opacity: 0; }
+    20% { opacity: 1; }
+    40% { opacity: 0.8; }
+    60% { opacity: 1; }
+    80% { opacity: 0.5; }
+    100% { opacity: 0; }
+}
+
+.fps-counter {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    padding: 5px 10px;
+    border-radius: 5px;
+    z-index: 30;
+}
+
+/* Optimized cloud styles - reduced complexity */
+.cloud:before,
+.cloud:after {
+    content: '';
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50px;
+}
+
+.cloud1 {
+    width: 100px;
+    height: 40px;
+    top: 20%;
+}
+
+.cloud1:before {
+    width: 50px;
+    height: 50px;
+    top: -25px;
+    left: 10px;
+}
+
+.cloud1:after {
+    width: 60px;
+    height: 20px;
+    top: -10px;
+    right: 10px;
+}
+
+.cloud2 {
+    width: 80px;
+    height: 30px;
+    top: 60%;
+}
+
+.cloud2:before {
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    left: 15px;
+}
+
+.cloud2:after {
+    width: 50px;
+    height: 15px;
+    top: -5px;
+    right: 15px;
+}
+
+.cloud3 {
+    width: 120px;
+    height: 50px;
+    top: 10%;
+}
+
+.cloud3:before {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+    left: 20px;
+}
+
+.cloud3:after {
+    width: 70px;
+    height: 25px;
+    top: -12px;
+    right: 20px;
+}
+
+.cloud4 {
+    width: 90px;
+    height: 35px;
+    top: 40%;
+}
+
+.cloud4:before {
+    width: 45px;
+    height: 45px;
+    top: -22px;
+    left: 12px;
+}
+
+.cloud4:after {
+    width: 55px;
+    height: 18px;
+    top: -8px;
+    right: 12px;
+}
+
+.cloud5 {
+    width: 85px;
+    height: 32px;
+    top: 75%;
+}
+
+.cloud5:before {
+    width: 42px;
+    height: 42px;
+    top: -21px;
+    left: 14px;
+}
+
+.cloud5:after {
+    width: 52px;
+    height: 16px;
+    top: -7px;
+    right: 14px;
+}
+
+.pyramid-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.pyramid {
+    width: 0;
+    height: 0;
+    border-left: 150px solid transparent;
+    border-right: 150px solid transparent;
+    border-bottom: 200px solid #d4af37;
+    position: relative;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+}
+
+.eye-container {
+    position: absolute;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 80px;
+}
+
+.eye {
+    width: 80px;
+    height: 80px;
+    background: radial-gradient(circle, #fff 0%, #f0f0f0 70%, #ddd 100%);
+    border-radius: 50%;
+    position: relative;
+    border: 3px solid #333;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+}
+
+.iris {
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #E62658 0%, #652482 70%, #fff 100%);
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+    will-change: transform;
+}
+
+.pupil {
+    width: 16px;
+    height: 16px;
+    background: #000;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.pupil:after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+}
+
+.laser {
+    position: absolute;
+    width: 4px;
+    background: linear-gradient(to bottom, #ff0000, #ff4444, #ff0000);
+    border-radius: 2px;
+    box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+    transform-origin: top center;
+    opacity: 0;
+    transition: opacity 0.1s ease;
+    z-index: 25;
+    will-change: transform, opacity;
+}
+
+.laser.active {
+    opacity: 1;
+    animation: laser-pulse 0.3s ease-out;
+}
+
+@keyframes laser-pulse {
+    0% {
+        box-shadow: 0 0 5px #ff0000;
+    }
+    50% {
+        box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000, 0 0 45px #ff0000;
+    }
+    100% {
+        box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+    }
+}
+
+.explosion {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+}
+
+.explosion.active {
+    animation: explode 0.6s ease-out forwards;
+}
+
+@keyframes explode {
+    0% {
+        background: radial-gradient(circle, #ff4444 0%, #ff0000 30%, transparent 70%);
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 1;
+    }
+    50% {
+        background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, transparent 70%);
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, transparent 70%);
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.destruction-explosion {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+}
+
+.destruction-explosion.active {
+    animation: destruction-explode 0.8s ease-out forwards;
+}
+
+@keyframes destruction-explode {
+    0% {
+        background: radial-gradient(circle, #ffff00 0%, #ff8800 20%, #ff4444 40%, transparent 70%);
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 1;
+        box-shadow: 0 0 20px #ffff00;
+    }
+    30% {
+        background: radial-gradient(circle, #ffffff 0%, #ffff00 10%, #ff8800 30%, #ff4444 50%, transparent 70%);
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+        box-shadow: 0 0 40px #ffaa00;
+    }
+    60% {
+        background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, #880000 60%, transparent 70%);
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+        box-shadow: 0 0 30px #ff4444;
+    }
+    100% {
+        background: radial-gradient(circle, #ff4444 0%, #880000 30%, #440000 50%, transparent 70%);
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+        box-shadow: 0 0 10px #ff0000;
+    }
+}
+
+.mystical-glow {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    animation: glow 3s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0.8;
+        transform: scale(1.1);
+    }
+} 
