@@ -4,6 +4,8 @@ A simple JavaScript game made with AI where you control a mystical pyramid's las
 
 Original Idea by [Berenger](https://github.com/Berenger)
 
+Playable version [here](https://starbugstone.github.io/cjd/)
+
 ## Game Overview
 
 CJ Nuagique is a browser-based defense game where players control an all-seeing pyramid eye that can fire lasers to destroy various flying objects. The game features a beautiful sky backdrop with animated clouds and challenging targets that move across the screen.
