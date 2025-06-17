@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CJ Nuagique</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            background: linear-gradient(135deg, #0C4DA1 0%, #4FA0D8 100%);
+            overflow: hidden;
+            cursor: crosshair;
+        }
+
+        .clouds {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .cloud {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+            opacity: 0.6;
+            animation: float linear infinite;
+            transition: opacity 0.3s ease;
+        }
+
+        .cloud.vaporized {
+            animation: vaporize 1s ease-out forwards !important;
+        }
+
+        @keyframes vaporize {
+            0% {
+                opacity: 0.6;
+                transform: scale(1);
+                filter: blur(0px);
+                background: rgba(255, 255, 255, 0.8);
+            }
+            25% {
+                opacity: 0.8;
+                transform: scale(1.2);
+                filter: blur(1px);
+                background: rgba(255, 200, 100, 0.9);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.5);
+                filter: blur(3px);
+                background: rgba(255, 150, 50, 0.7);
+            }
+            75% {
+                opacity: 0.3;
+                transform: scale(1.8);
+                filter: blur(5px);
+                background: rgba(255, 100, 0, 0.5);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(2.2);
+                filter: blur(8px);
+                background: rgba(255, 50, 0, 0.2);
+            }
+        }
+
+        .airplane {
+            position: absolute;
+            width: 60px;
+            height: 30px;
+            left: -80px;
+            z-index: 15;
+            transition: none;
+        }
+
+        .airplane.flying {
+            animation: fly linear;
+        }
+
+        .airplane:before {
+            content: '🗂️';
+            font-size: 45px;
+            position: absolute;
+            top: -10px;
+            left: 10px;
+        }
+
+        .airplane.crashed {
+            animation: crash 1s ease-out forwards;
+        }
+
+        .robot {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            top: 70%;
+            left: -60px;
+            z-index: 15;
+            animation: robot-wave 3s linear;
+            animation-fill-mode: forwards;
+        }
+
+        .robot:before {
+            content: '🤖';
+            font-size: 40px;
+            position: absolute;
+            top: -5px;
+            left: 5px;
+        }
+
+        .robot.destroyed {
+            animation: robot-explode 1s ease-out forwards;
+        }
+
+        @keyframes fly {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(calc(100vw + 100px));
+            }
+        }
+
+        @keyframes robot-wave {
+            0% {
+                transform: translateX(0) translateY(0);
+            }
+            12.5% {
+                transform: translateX(calc(12.5vw)) translateY(-30px);
+            }
+            25% {
+                transform: translateX(calc(25vw)) translateY(0);
+            }
+            37.5% {
+                transform: translateX(calc(37.5vw)) translateY(30px);
+            }
+            50% {
+                transform: translateX(calc(50vw)) translateY(0);
+            }
+            62.5% {
+                transform: translateX(calc(62.5vw)) translateY(-30px);
+            }
+            75% {
+                transform: translateX(calc(75vw)) translateY(0);
+            }
+            87.5% {
+                transform: translateX(calc(87.5vw)) translateY(30px);
+            }
+            100% {
+                transform: translateX(calc(100vw + 80px)) translateY(0);
+            }
+        }
+
+        @keyframes crash {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: rotate(180deg) scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: rotate(360deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes robot-explode {
+            0% {
+                transform: rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            25% {
+                transform: rotate(90deg) scale(1.3);
+                opacity: 0.9;
+            }
+            50% {
+                transform: rotate(180deg) scale(1.5);
+                opacity: 0.7;
+            }
+            75% {
+                transform: rotate(270deg) scale(1.2);
+                opacity: 0.4;
+            }
+            100% {
+                transform: rotate(360deg) scale(0.3);
+                opacity: 0;
+            }
+        }
+
+        .score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 30;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid #F5C100;
+        }
+
+        .cloud:before,
+        .cloud:after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50px;
+        }
+
+        .cloud1 {
+            width: 100px;
+            height: 40px;
+            top: 20%;
+            left: -100px;
+            animation-duration: 20s;
+        }
+
+        .cloud1:before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+
+        .cloud1:after {
+            width: 60px;
+            height: 20px;
+            top: -10px;
+            right: 10px;
+        }
+
+        .cloud2 {
+            width: 80px;
+            height: 30px;
+            top: 60%;
+            left: -80px;
+            animation-duration: 25s;
+            animation-delay: -10s;
+        }
+
+        .cloud2:before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud2:after {
+            width: 50px;
+            height: 15px;
+            top: -5px;
+            right: 15px;
+        }
+
+        .cloud3 {
+            width: 120px;
+            height: 50px;
+            top: 10%;
+            left: -120px;
+            animation-duration: 30s;
+            animation-delay: -20s;
+        }
+
+        .cloud3:before {
+            width: 60px;
+            height: 60px;
+            top: -30px;
+            left: 20px;
+        }
+
+        .cloud3:after {
+            width: 70px;
+            height: 25px;
+            top: -12px;
+            right: 20px;
+        }
+
+        .cloud4 {
+            width: 90px;
+            height: 35px;
+            top: 40%;
+            left: -90px;
+            animation-duration: 18s;
+            animation-delay: -5s;
+        }
+
+        .cloud4:before {
+            width: 45px;
+            height: 45px;
+            top: -22px;
+            left: 12px;
+        }
+
+        .cloud4:after {
+            width: 55px;
+            height: 18px;
+            top: -8px;
+            right: 12px;
+        }
+
+        .cloud5 {
+            width: 110px;
+            height: 45px;
+            top: 80%;
+            left: -110px;
+            animation-duration: 22s;
+            animation-delay: -12s;
+        }
+
+        .cloud5:before {
+            width: 55px;
+            height: 55px;
+            top: -27px;
+            left: 18px;
+        }
+
+        .cloud5:after {
+            width: 65px;
+            height: 22px;
+            top: -10px;
+            right: 18px;
+        }
+
+        .cloud6 {
+            width: 75px;
+            height: 28px;
+            top: 25%;
+            left: -75px;
+            animation-duration: 16s;
+            animation-delay: -8s;
+        }
+
+        .cloud6:before {
+            width: 38px;
+            height: 38px;
+            top: -19px;
+            left: 10px;
+        }
+
+        .cloud6:after {
+            width: 48px;
+            height: 14px;
+            top: -6px;
+            right: 10px;
+        }
+
+        @keyframes float {
+            from {
+                transform: translateX(0);
+            }
+            to {
+                transform: translateX(calc(100vw + 200px));
+            }
+        }
+
+        .pyramid-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .pyramid {
+            width: 0;
+            height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-bottom: 200px solid #d4af37;
+            position: relative;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+
+        .eye-container {
+            position: absolute;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
+        }
+
+        .eye {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fff 0%, #f0f0f0 70%, #ddd 100%);
+            border-radius: 50%;
+            position: relative;
+            border: 3px solid #333;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        .iris {
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #E62658 0%, #652482 70%, #fff 100%);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+        }
+
+        .pupil {
+            width: 16px;
+            height: 16px;
+            background: #000;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .pupil:after {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: rgba(255,255,255,0.8);
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+        }
+
+        .laser {
+            position: absolute;
+            width: 4px;
+            background: linear-gradient(to bottom, #ff0000, #ff4444, #ff0000);
+            border-radius: 2px;
+            box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            transform-origin: top center;
+            opacity: 0;
+            transition: opacity 0.1s ease;
+            z-index: 25;
+        }
+
+        .laser.active {
+            opacity: 1;
+            animation: laser-pulse 0.3s ease-out;
+        }
+
+        @keyframes laser-pulse {
+            0% {
+                box-shadow: 0 0 5px #ff0000;
+            }
+            50% {
+                box-shadow: 0 0 15px #ff0000, 0 0 30px #ff0000, 0 0 45px #ff0000;
+            }
+            100% {
+                box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000, 0 0 30px #ff0000;
+            }
+        }
+
+        .explosion {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+
+        .explosion.active {
+            animation: explode 0.6s ease-out forwards;
+        }
+
+        @keyframes explode {
+            0% {
+                background: radial-gradient(circle, #ff4444 0%, #ff0000 30%, transparent 70%);
+                transform: translate(-50%, -50%) scale(0.1);
+                opacity: 1;
+            }
+            50% {
+                background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, transparent 70%);
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+            100% {
+                background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, transparent 70%);
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .destruction-explosion {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 20;
+            transform: translate(-50%, -50%);
+        }
+
+        .destruction-explosion.active {
+            animation: destruction-explode 0.8s ease-out forwards;
+        }
+
+        @keyframes destruction-explode {
+            0% {
+                background: radial-gradient(circle, #ffff00 0%, #ff8800 20%, #ff4444 40%, transparent 70%);
+                transform: translate(-50%, -50%) scale(0.1);
+                opacity: 1;
+                box-shadow: 0 0 20px #ffff00;
+            }
+            30% {
+                background: radial-gradient(circle, #ffffff 0%, #ffff00 10%, #ff8800 30%, #ff4444 50%, transparent 70%);
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 1;
+                box-shadow: 0 0 40px #ffaa00;
+            }
+            60% {
+                background: radial-gradient(circle, #ffaa00 0%, #ff4444 20%, #ff0000 40%, #880000 60%, transparent 70%);
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 0.8;
+                box-shadow: 0 0 30px #ff4444;
+            }
+            100% {
+                background: radial-gradient(circle, #ff4444 0%, #880000 30%, #440000 50%, transparent 70%);
+                transform: translate(-50%, -50%) scale(1.8);
+                opacity: 0;
+                box-shadow: 0 0 10px #ff0000;
+            }
+        }
+
+        .mystical-glow {
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: radial-gradient(circle, rgba(212, 175, 55, 0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: glow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                opacity: 0.5;
+                transform: scale(1);
+            }
+            to {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="score" id="score">Score: 0</div>
+
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        <div class="cloud cloud4"></div>
+        <div class="cloud cloud5"></div>
+        <div class="cloud cloud6"></div>
+        <div class="robot"></div>
+    </div>
+
+    <div class="pyramid-container">
+        <div class="pyramid">
+            <div class="eye-container">
+                <div class="mystical-glow"></div>
+                <div class="eye">
+                    <div class="iris">
+                        <div class="pupil"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="laser" id="laser"></div>
+
+    <script>
+        const iris = document.querySelector('.iris');
+        const eyeContainer = document.querySelector('.eye-container');
+        const eye = document.querySelector('.eye');
+        const laser = document.getElementById('laser');
+        const scoreElement = document.getElementById('score');
+        let mouseX = 0;
+        let mouseY = 0;
+        let score = 0;
+
+        // Track mouse movement
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            updateEyePosition();
+        });
+
+        function updateEyePosition() {
+            const eyeRect = eyeContainer.getBoundingClientRect();
+            const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+            const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+            const deltaX = mouseX - eyeCenterX;
+            const deltaY = mouseY - eyeCenterY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+            // Limit the iris movement within the eye
+            const maxDistance = 20;
+            const limitedDistance = Math.min(distance, maxDistance);
+            const angle = Math.atan2(deltaY, deltaX);
+
+            const irisX = Math.cos(angle) * limitedDistance;
+            const irisY = Math.sin(angle) * limitedDistance;
+
+            iris.style.transform = `translate(calc(-50% + ${irisX}px), calc(-50% + ${irisY}px))`;
+        }
+
+        // Handle laser firing on click
+        document.addEventListener('click', (e) => {
+            fireLaser(e.clientX, e.clientY);
+        });
+
+        function fireLaser(targetX, targetY) {
+            const pupilRect = document.querySelector('.pupil').getBoundingClientRect();
+            const pupilCenterX = pupilRect.left + pupilRect.width / 2;
+            const pupilCenterY = pupilRect.top + pupilRect.height / 2;
+
+            const deltaX = targetX - pupilCenterX;
+            const deltaY = targetY - pupilCenterY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+            // Check if laser hits any clouds, airplane, or robot
+            checkCloudCollision(pupilCenterX, pupilCenterY, targetX, targetY);
+            checkAirplaneCollision(pupilCenterX, pupilCenterY, targetX, targetY);
+            checkRobotCollision(pupilCenterX, pupilCenterY, targetX, targetY);
+
+            // Position and rotate the laser to start from the center of the pupil
+            laser.style.left = pupilCenterX + 'px';
+            laser.style.top = pupilCenterY + 'px';
+            laser.style.height = distance + 'px';
+            laser.style.transform = `rotate(${angle - 90}deg)`;
+
+            // Activate the laser
+            laser.classList.add('active');
+
+            // Create explosion at cursor position
+            createExplosion(targetX, targetY);
+
+            // Remove the laser after animation
+            setTimeout(() => {
+                laser.classList.remove('active');
+            }, 300);
+        }
+
+        function checkCloudCollision(startX, startY, endX, endY) {
+            const clouds = document.querySelectorAll('.cloud:not(.vaporized)');
+            
+            clouds.forEach(cloud => {
+                const cloudRect = cloud.getBoundingClientRect();
+                const cloudCenterX = cloudRect.left + cloudRect.width / 2;
+                const cloudCenterY = cloudRect.top + cloudRect.height / 2;
+                
+                // Check if the laser line intersects with the cloud
+                if (isPointNearLine(startX, startY, endX, endY, cloudCenterX, cloudCenterY, 50)) {
+                    vaporizeCloud(cloud);
+                    createDestructionExplosion(cloudCenterX, cloudCenterY);
+                }
+            });
+        }
+
+        function isPointNearLine(x1, y1, x2, y2, px, py, threshold) {
+            // Calculate distance from point to line
+            const A = px - x1;
+            const B = py - y1;
+            const C = x2 - x1;
+            const D = y2 - y1;
+
+            const dot = A * C + B * D;
+            const lenSq = C * C + D * D;
+            let param = -1;
+            if (lenSq !== 0) {
+                param = dot / lenSq;
+            }
+
+            let xx, yy;
+
+            if (param < 0) {
+                xx = x1;
+                yy = y1;
+            } else if (param > 1) {
+                xx = x2;
+                yy = y2;
+            } else {
+                xx = x1 + param * C;
+                yy = y1 + param * D;
+            }
+
+            const dx = px - xx;
+            const dy = py - yy;
+            return Math.sqrt(dx * dx + dy * dy) < threshold;
+        }
+
+        function vaporizeCloud(cloud) {
+            // Temporarily remove the float animation to show vaporize animation
+            const originalAnimation = cloud.style.animation;
+            cloud.style.animation = 'none';
+            cloud.classList.add('vaporized');
+            
+            // Increase score
+            score--;
+            scoreElement.textContent = `Score: ${score}`;
+            
+            // Respawn the cloud after a delay
+            setTimeout(() => {
+                cloud.classList.remove('vaporized');
+                cloud.style.animation = originalAnimation;
+                // Reset cloud position to start from the left again
+                cloud.style.left = '-200px';
+            }, 3000);
+        }
+
+        function checkAirplaneCollision(startX, startY, endX, endY) {
+            const airplanes = document.querySelectorAll('.airplane:not(.crashed)');
+            
+            airplanes.forEach(airplane => {
+                const airplaneRect = airplane.getBoundingClientRect();
+                const airplaneCenterX = airplaneRect.left + airplaneRect.width / 2;
+                const airplaneCenterY = airplaneRect.top + airplaneRect.height / 2;
+                
+                // Check if the laser line intersects with the airplane
+                if (isPointNearLine(startX, startY, endX, endY, airplaneCenterX, airplaneCenterY, 40)) {
+                    crashAirplane(airplane);
+                    createDestructionExplosion(airplaneCenterX, airplaneCenterY);
+                }
+            });
+        }
+
+        function crashAirplane(airplane) {
+            airplane.classList.add('crashed');
+            
+            // Increase score by 1 point
+            score += 1;
+            scoreElement.textContent = `Score: ${score}`;
+            
+            // Remove the airplane after crash animation
+            setTimeout(() => {
+                if (airplane.parentNode) {
+                    airplane.parentNode.removeChild(airplane);
+                }
+            }, 1000);
+        }
+
+        function checkRobotCollision(startX, startY, endX, endY) {
+            const robot = document.querySelector('.robot:not(.destroyed)');
+            if (!robot) return;
+            
+            const robotRect = robot.getBoundingClientRect();
+            const robotCenterX = robotRect.left + robotRect.width / 2;
+            const robotCenterY = robotRect.top + robotRect.height / 2;
+            
+            // Check if the laser line intersects with the robot
+            if (isPointNearLine(startX, startY, endX, endY, robotCenterX, robotCenterY, 35)) {
+                destroyRobot(robot);
+                createDestructionExplosion(robotCenterX, robotCenterY);
+            }
+        }
+
+        function destroyRobot(robot) {
+            robot.classList.add('destroyed');
+            
+            // Increase score by 3 points
+            score += 3;
+            scoreElement.textContent = `Score: ${score}`;
+            
+            // Remove the robot element after the destruction animation
+            setTimeout(() => {
+                if (robot.parentNode) {
+                    robot.parentNode.removeChild(robot);
+                }
+            }, 1000);
+        }
+
+        function createExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'explosion active';
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+            document.body.appendChild(explosion);
+
+            // Remove explosion element after animation
+            setTimeout(() => {
+                document.body.removeChild(explosion);
+            }, 600);
+        }
+
+        function createDestructionExplosion(x, y) {
+            const explosion = document.createElement('div');
+            explosion.className = 'destruction-explosion active';
+            explosion.style.left = x + 'px';
+            explosion.style.top = y + 'px';
+            document.body.appendChild(explosion);
+
+            // Remove explosion element after animation
+            setTimeout(() => {
+                document.body.removeChild(explosion);
+            }, 800);
+        }
+
+        // Initialize eye position
+        updateEyePosition();
+
+        // Robot spawning system
+        function spawnRobot() {
+            // Create new robot
+            const newRobot = document.createElement('div');
+            newRobot.className = 'robot';
+            
+            // Random vertical position between 30% and 80%
+            const randomTop = Math.random() * 50 + 30;
+            newRobot.style.top = randomTop + '%';
+            
+            document.querySelector('.clouds').appendChild(newRobot);
+            
+            // Remove robot after it crosses the screen (if not destroyed)
+            setTimeout(() => {
+                if (newRobot.parentNode && !newRobot.classList.contains('destroyed')) {
+                    newRobot.parentNode.removeChild(newRobot);
+                }
+            }, 3500); // Robot takes 3 seconds to cross + buffer
+        }
+
+        function scheduleNextRobot() {
+            // Random delay between 10-15 seconds for next robot
+            const delay = Math.random() * 5000 + 10000;
+            setTimeout(() => {
+                spawnRobot();
+                scheduleNextRobot(); // Schedule the next one
+            }, delay);
+        }
+
+        // Start robot spawning after initial delay (10 seconds)
+        setTimeout(() => {
+            spawnRobot(); // Spawn first robot
+            scheduleNextRobot(); // Start the recurring schedule
+        }, 10000);
+
+        // Airplane spawning system
+        function spawnAirplanes() {
+            // Random number of airplanes to spawn (1-4)
+            const numAirplanes = Math.floor(Math.random() * 4) + 1;
+            
+            for (let i = 0; i < numAirplanes; i++) {
+                // Random delay for each airplane (0-2 seconds apart)
+                const delay = Math.random() * 2000;
+                
+                setTimeout(() => {
+                    createAirplane();
+                }, delay);
+            }
+            
+            // Schedule next batch of airplanes with random interval (2-6 seconds)
+            const nextSpawnDelay = Math.random() * 4000 + 2000;
+            setTimeout(spawnAirplanes, nextSpawnDelay);
+        }
+
+        function createAirplane() {
+            const airplane = document.createElement('div');
+            airplane.className = 'airplane flying';
+            
+            // Random vertical position between 10% and 90%
+            const randomTop = Math.random() * 80 + 10;
+            airplane.style.top = randomTop + '%';
+            
+            // Random speed (2-5 seconds to cross screen)
+            const duration = Math.random() * 3 + 2;
+            airplane.style.animationDuration = duration + 's';
+            
+            document.querySelector('.clouds').appendChild(airplane);
+            
+            // Remove airplane after it crosses the screen
+            setTimeout(() => {
+                if (airplane.parentNode && !airplane.classList.contains('crashed')) {
+                    airplane.parentNode.removeChild(airplane);
+                }
+            }, duration * 1000 + 1000);
+        }
+
+        // Start airplane spawning immediately
+        spawnAirplanes();
+    </script>
+</body>
+</html>
