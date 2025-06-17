@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CJ Nuagique</title>
+    <title>CJ Nuagique - Optimized</title>
     <style>
         * {
             margin: 0;
@@ -16,8 +16,10 @@
             background: linear-gradient(135deg, #0C4DA1 0%, #4FA0D8 100%);
             overflow: hidden;
             cursor: crosshair;
+            font-family: Arial, sans-serif;
         }
 
+        /* Performance optimizations */
         .clouds {
             position: absolute;
             width: 100%;
@@ -25,6 +27,7 @@
             top: 0;
             left: 0;
             z-index: 1;
+            will-change: transform; /* Enable hardware acceleration */
         }
 
         .cloud {
@@ -32,8 +35,8 @@
             background: rgba(255, 255, 255, 0.8);
             border-radius: 50px;
             opacity: 0.6;
-            animation: float linear infinite;
-            transition: opacity 0.3s ease;
+            will-change: transform;
+            transform: translateZ(0); /* Force hardware acceleration */
         }
 
         .cloud.vaporized {
@@ -43,47 +46,47 @@
         @keyframes vaporize {
             0% {
                 opacity: 0.6;
-                transform: scale(1);
+                transform: scale(1) translateZ(0);
                 filter: blur(0px);
                 background: rgba(255, 255, 255, 0.8);
             }
             25% {
                 opacity: 0.8;
-                transform: scale(1.2);
+                transform: scale(1.2) translateZ(0);
                 filter: blur(1px);
                 background: rgba(255, 200, 100, 0.9);
             }
             50% {
                 opacity: 0.6;
-                transform: scale(1.5);
+                transform: scale(1.5) translateZ(0);
                 filter: blur(3px);
                 background: rgba(255, 150, 50, 0.7);
             }
             75% {
                 opacity: 0.3;
-                transform: scale(1.8);
+                transform: scale(1.8) translateZ(0);
                 filter: blur(5px);
                 background: rgba(255, 100, 0, 0.5);
             }
             100% {
                 opacity: 0;
-                transform: scale(2.2);
+                transform: scale(2.2) translateZ(0);
                 filter: blur(8px);
                 background: rgba(255, 50, 0, 0.2);
             }
         }
 
-        .airplane {
+        .moving-object {
             position: absolute;
+            z-index: 15;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .airplane {
             width: 60px;
             height: 30px;
             left: -80px;
-            z-index: 15;
-            transition: none;
-        }
-
-        .airplane.flying {
-            animation: fly linear;
         }
 
         .airplane:before {
@@ -99,14 +102,10 @@
         }
 
         .robot {
-            position: absolute;
             width: 50px;
             height: 50px;
             top: 70%;
             left: -60px;
-            z-index: 15;
-            animation: robot-wave 3s linear;
-            animation-fill-mode: forwards;
         }
 
         .robot:before {
@@ -121,79 +120,40 @@
             animation: robot-explode 1s ease-out forwards;
         }
 
-        @keyframes fly {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(calc(100vw + 100px));
-            }
-        }
-
-        @keyframes robot-wave {
-            0% {
-                transform: translateX(0) translateY(0);
-            }
-            12.5% {
-                transform: translateX(calc(12.5vw)) translateY(-30px);
-            }
-            25% {
-                transform: translateX(calc(25vw)) translateY(0);
-            }
-            37.5% {
-                transform: translateX(calc(37.5vw)) translateY(30px);
-            }
-            50% {
-                transform: translateX(calc(50vw)) translateY(0);
-            }
-            62.5% {
-                transform: translateX(calc(62.5vw)) translateY(-30px);
-            }
-            75% {
-                transform: translateX(calc(75vw)) translateY(0);
-            }
-            87.5% {
-                transform: translateX(calc(87.5vw)) translateY(30px);
-            }
-            100% {
-                transform: translateX(calc(100vw + 80px)) translateY(0);
-            }
-        }
-
         @keyframes crash {
             0% {
-                transform: rotate(0deg) scale(1);
+                transform: rotate(0deg) scale(1) translateZ(0);
                 opacity: 1;
             }
             50% {
-                transform: rotate(180deg) scale(1.2);
+                transform: rotate(180deg) scale(1.2) translateZ(0);
                 opacity: 0.8;
             }
             100% {
-                transform: rotate(360deg) scale(0.5);
+                transform: rotate(360deg) scale(0.5) translateZ(0);
                 opacity: 0;
             }
         }
 
         @keyframes robot-explode {
             0% {
-                transform: rotate(0deg) scale(1);
+                transform: rotate(0deg) scale(1) translateZ(0);
                 opacity: 1;
             }
             25% {
-                transform: rotate(90deg) scale(1.3);
+                transform: rotate(90deg) scale(1.3) translateZ(0);
                 opacity: 0.9;
             }
             50% {
-                transform: rotate(180deg) scale(1.5);
+                transform: rotate(180deg) scale(1.5) translateZ(0);
                 opacity: 0.7;
             }
             75% {
-                transform: rotate(270deg) scale(1.2);
+                transform: rotate(270deg) scale(1.2) translateZ(0);
                 opacity: 0.4;
             }
             100% {
-                transform: rotate(360deg) scale(0.3);
+                transform: rotate(360deg) scale(0.3) translateZ(0);
                 opacity: 0;
             }
         }
@@ -202,7 +162,6 @@
             position: absolute;
             top: 20px;
             right: 20px;
-            font-family: 'Arial', sans-serif;
             font-size: 24px;
             font-weight: bold;
             color: #fff;
@@ -214,6 +173,19 @@
             border: 2px solid #F5C100;
         }
 
+        .fps-counter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 16px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 5px;
+            z-index: 30;
+        }
+
+        /* Optimized cloud styles - reduced complexity */
         .cloud:before,
         .cloud:after {
             content: '';
@@ -226,8 +198,6 @@
             width: 100px;
             height: 40px;
             top: 20%;
-            left: -100px;
-            animation-duration: 20s;
         }
 
         .cloud1:before {
@@ -248,9 +218,6 @@
             width: 80px;
             height: 30px;
             top: 60%;
-            left: -80px;
-            animation-duration: 25s;
-            animation-delay: -10s;
         }
 
         .cloud2:before {
@@ -271,9 +238,6 @@
             width: 120px;
             height: 50px;
             top: 10%;
-            left: -120px;
-            animation-duration: 30s;
-            animation-delay: -20s;
         }
 
         .cloud3:before {
@@ -294,9 +258,6 @@
             width: 90px;
             height: 35px;
             top: 40%;
-            left: -90px;
-            animation-duration: 18s;
-            animation-delay: -5s;
         }
 
         .cloud4:before {
@@ -314,58 +275,23 @@
         }
 
         .cloud5 {
-            width: 110px;
-            height: 45px;
-            top: 80%;
-            left: -110px;
-            animation-duration: 22s;
-            animation-delay: -12s;
+            width: 85px;
+            height: 32px;
+            top: 75%;
         }
 
         .cloud5:before {
-            width: 55px;
-            height: 55px;
-            top: -27px;
-            left: 18px;
+            width: 42px;
+            height: 42px;
+            top: -21px;
+            left: 14px;
         }
 
         .cloud5:after {
-            width: 65px;
-            height: 22px;
-            top: -10px;
-            right: 18px;
-        }
-
-        .cloud6 {
-            width: 75px;
-            height: 28px;
-            top: 25%;
-            left: -75px;
-            animation-duration: 16s;
-            animation-delay: -8s;
-        }
-
-        .cloud6:before {
-            width: 38px;
-            height: 38px;
-            top: -19px;
-            left: 10px;
-        }
-
-        .cloud6:after {
-            width: 48px;
-            height: 14px;
-            top: -6px;
-            right: 10px;
-        }
-
-        @keyframes float {
-            from {
-                transform: translateX(0);
-            }
-            to {
-                transform: translateX(calc(100vw + 200px));
-            }
+            width: 52px;
+            height: 16px;
+            top: -7px;
+            right: 14px;
         }
 
         .pyramid-container {
@@ -414,7 +340,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
+            transition: transform 0.1s ease;
+            will-change: transform;
         }
 
         .pupil {
@@ -449,6 +376,7 @@
             opacity: 0;
             transition: opacity 0.1s ease;
             z-index: 25;
+            will-change: transform, opacity;
         }
 
         .laser.active {
@@ -565,16 +493,15 @@
     </style>
 </head>
 <body>
+    <div class="fps-counter" id="fps">FPS: 0</div>
     <div class="score" id="score">Score: 0</div>
 
-    <div class="clouds">
+    <div class="clouds" id="clouds-container">
         <div class="cloud cloud1"></div>
         <div class="cloud cloud2"></div>
         <div class="cloud cloud3"></div>
         <div class="cloud cloud4"></div>
         <div class="cloud cloud5"></div>
-        <div class="cloud cloud6"></div>
-        <div class="robot"></div>
     </div>
 
     <div class="pyramid-container">
@@ -593,315 +520,584 @@
     <div class="laser" id="laser"></div>
 
     <script>
-        const iris = document.querySelector('.iris');
-        const eyeContainer = document.querySelector('.eye-container');
-        const eye = document.querySelector('.eye');
-        const laser = document.getElementById('laser');
-        const scoreElement = document.getElementById('score');
-        let mouseX = 0;
-        let mouseY = 0;
-        let score = 0;
+        // Performance optimized game engine
+        class OptimizedGame {
+            constructor() {
+                // Cache DOM elements
+                this.elements = {
+                    iris: document.querySelector('.iris'),
+                    eyeContainer: document.querySelector('.eye-container'),
+                    laser: document.getElementById('laser'),
+                    scoreElement: document.getElementById('score'),
+                    fpsElement: document.getElementById('fps'),
+                    cloudsContainer: document.getElementById('clouds-container')
+                };
 
-        // Track mouse movement
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            updateEyePosition();
-        });
-
-        function updateEyePosition() {
-            const eyeRect = eyeContainer.getBoundingClientRect();
-            const eyeCenterX = eyeRect.left + eyeRect.width / 2;
-            const eyeCenterY = eyeRect.top + eyeRect.height / 2;
-
-            const deltaX = mouseX - eyeCenterX;
-            const deltaY = mouseY - eyeCenterY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-            // Limit the iris movement within the eye
-            const maxDistance = 20;
-            const limitedDistance = Math.min(distance, maxDistance);
-            const angle = Math.atan2(deltaY, deltaX);
-
-            const irisX = Math.cos(angle) * limitedDistance;
-            const irisY = Math.sin(angle) * limitedDistance;
-
-            iris.style.transform = `translate(calc(-50% + ${irisX}px), calc(-50% + ${irisY}px))`;
-        }
-
-        // Handle laser firing on click
-        document.addEventListener('click', (e) => {
-            fireLaser(e.clientX, e.clientY);
-        });
-
-        function fireLaser(targetX, targetY) {
-            const pupilRect = document.querySelector('.pupil').getBoundingClientRect();
-            const pupilCenterX = pupilRect.left + pupilRect.width / 2;
-            const pupilCenterY = pupilRect.top + pupilRect.height / 2;
-
-            const deltaX = targetX - pupilCenterX;
-            const deltaY = targetY - pupilCenterY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
-
-            // Check if laser hits any clouds, airplane, or robot
-            checkCloudCollision(pupilCenterX, pupilCenterY, targetX, targetY);
-            checkAirplaneCollision(pupilCenterX, pupilCenterY, targetX, targetY);
-            checkRobotCollision(pupilCenterX, pupilCenterY, targetX, targetY);
-
-            // Position and rotate the laser to start from the center of the pupil
-            laser.style.left = pupilCenterX + 'px';
-            laser.style.top = pupilCenterY + 'px';
-            laser.style.height = distance + 'px';
-            laser.style.transform = `rotate(${angle - 90}deg)`;
-
-            // Activate the laser
-            laser.classList.add('active');
-
-            // Create explosion at cursor position
-            createExplosion(targetX, targetY);
-
-            // Remove the laser after animation
-            setTimeout(() => {
-                laser.classList.remove('active');
-            }, 300);
-        }
-
-        function checkCloudCollision(startX, startY, endX, endY) {
-            const clouds = document.querySelectorAll('.cloud:not(.vaporized)');
-            
-            clouds.forEach(cloud => {
-                const cloudRect = cloud.getBoundingClientRect();
-                const cloudCenterX = cloudRect.left + cloudRect.width / 2;
-                const cloudCenterY = cloudRect.top + cloudRect.height / 2;
+                // Game state
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.score = 0;
+                this.isLive = true;
+                this.isLaserActive = false;
                 
-                // Check if the laser line intersects with the cloud
-                if (isPointNearLine(startX, startY, endX, endY, cloudCenterX, cloudCenterY, 50)) {
-                    vaporizeCloud(cloud);
-                    createDestructionExplosion(cloudCenterX, cloudCenterY);
-                }
-            });
-        }
-
-        function isPointNearLine(x1, y1, x2, y2, px, py, threshold) {
-            // Calculate distance from point to line
-            const A = px - x1;
-            const B = py - y1;
-            const C = x2 - x1;
-            const D = y2 - y1;
-
-            const dot = A * C + B * D;
-            const lenSq = C * C + D * D;
-            let param = -1;
-            if (lenSq !== 0) {
-                param = dot / lenSq;
-            }
-
-            let xx, yy;
-
-            if (param < 0) {
-                xx = x1;
-                yy = y1;
-            } else if (param > 1) {
-                xx = x2;
-                yy = y2;
-            } else {
-                xx = x1 + param * C;
-                yy = y1 + param * D;
-            }
-
-            const dx = px - xx;
-            const dy = py - yy;
-            return Math.sqrt(dx * dx + dy * dy) < threshold;
-        }
-
-        function vaporizeCloud(cloud) {
-            // Temporarily remove the float animation to show vaporize animation
-            const originalAnimation = cloud.style.animation;
-            cloud.style.animation = 'none';
-            cloud.classList.add('vaporized');
-            
-            // Increase score
-            score--;
-            scoreElement.textContent = `Score: ${score}`;
-            
-            // Respawn the cloud after a delay
-            setTimeout(() => {
-                cloud.classList.remove('vaporized');
-                cloud.style.animation = originalAnimation;
-                // Reset cloud position to start from the left again
-                cloud.style.left = '-200px';
-            }, 3000);
-        }
-
-        function checkAirplaneCollision(startX, startY, endX, endY) {
-            const airplanes = document.querySelectorAll('.airplane:not(.crashed)');
-            
-            airplanes.forEach(airplane => {
-                const airplaneRect = airplane.getBoundingClientRect();
-                const airplaneCenterX = airplaneRect.left + airplaneRect.width / 2;
-                const airplaneCenterY = airplaneRect.top + airplaneRect.height / 2;
+                // Performance tracking
+                this.lastTime = 0;
+                this.frameCount = 0;
+                this.fps = 0;
                 
-                // Check if the laser line intersects with the airplane
-                if (isPointNearLine(startX, startY, endX, endY, airplaneCenterX, airplaneCenterY, 40)) {
-                    crashAirplane(airplane);
-                    createDestructionExplosion(airplaneCenterX, airplaneCenterY);
-                }
-            });
-        }
-
-        function crashAirplane(airplane) {
-            airplane.classList.add('crashed');
-            
-            // Increase score by 1 point
-            score += 1;
-            scoreElement.textContent = `Score: ${score}`;
-            
-            // Remove the airplane after crash animation
-            setTimeout(() => {
-                if (airplane.parentNode) {
-                    airplane.parentNode.removeChild(airplane);
-                }
-            }, 1000);
-        }
-
-        function checkRobotCollision(startX, startY, endX, endY) {
-            const robot = document.querySelector('.robot:not(.destroyed)');
-            if (!robot) return;
-            
-            const robotRect = robot.getBoundingClientRect();
-            const robotCenterX = robotRect.left + robotRect.width / 2;
-            const robotCenterY = robotRect.top + robotRect.height / 2;
-            
-            // Check if the laser line intersects with the robot
-            if (isPointNearLine(startX, startY, endX, endY, robotCenterX, robotCenterY, 35)) {
-                destroyRobot(robot);
-                createDestructionExplosion(robotCenterX, robotCenterY);
+                // Object pools
+                this.airplanePool = [];
+                this.robotPool = [];
+                this.explosionPool = [];
+                this.destructionExplosionPool = [];
+                
+                // Active objects tracking
+                this.activeAirplanes = new Set();
+                this.activeRobots = new Set();
+                this.activeClouds = new Set();
+                
+                // Cloud management
+                this.cloudPositions = new Map();
+                this.cloudSpeeds = new Map();
+                
+                // Initialize
+                this.init();
             }
-        }
 
-        function destroyRobot(robot) {
-            robot.classList.add('destroyed');
-            
-            // Increase score by 3 points
-            score += 3;
-            scoreElement.textContent = `Score: ${score}`;
-            
-            // Remove the robot element after the destruction animation
-            setTimeout(() => {
-                if (robot.parentNode) {
-                    robot.parentNode.removeChild(robot);
+            init() {
+                this.setupEventListeners();
+                this.initializeClouds();
+                this.initializeObjectPools();
+                this.startGameLoop();
+                this.scheduleSpawning();
+            }
+
+            setupEventListeners() {
+                // Use cached references and passive listeners where possible
+                document.addEventListener('mousemove', this.handleMouseMove.bind(this), { passive: true });
+                document.addEventListener('click', this.handleClick.bind(this));
+                
+                // Handle window resize efficiently
+                let resizeTimeout;
+                window.addEventListener('resize', () => {
+                    clearTimeout(resizeTimeout);
+                    resizeTimeout = setTimeout(() => this.handleResize(), 100);
+                }, { passive: true });
+            }
+
+            handleMouseMove(e) {
+                this.mouseX = e.clientX;
+                this.mouseY = e.clientY;
+                this.updateEyePosition();
+            }
+
+            handleClick(e) {
+                this.fireLaser(e.clientX, e.clientY);
+            }
+
+            handleResize() {
+                // Update any size-dependent calculations
+                this.updateCloudBoundaries();
+            }
+
+            updateEyePosition() {
+                const eyeRect = this.elements.eyeContainer.getBoundingClientRect();
+                const eyeCenterX = eyeRect.left + eyeRect.width / 2;
+                const eyeCenterY = eyeRect.top + eyeRect.height / 2;
+
+                const deltaX = this.mouseX - eyeCenterX;
+                const deltaY = this.mouseY - eyeCenterY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                const maxDistance = 20;
+                const limitedDistance = Math.min(distance, maxDistance);
+                const angle = Math.atan2(deltaY, deltaX);
+
+                const irisX = Math.cos(angle) * limitedDistance;
+                const irisY = Math.sin(angle) * limitedDistance;
+
+                // Use transform instead of separate properties for better performance
+                this.elements.iris.style.transform = `translate(calc(-50% + ${irisX}px), calc(-50% + ${irisY}px))`;
+            }
+
+            // Object pooling implementation
+            initializeObjectPools() {
+                // Pre-create objects to avoid garbage collection
+                for (let i = 0; i < 10; i++) {
+                    this.airplanePool.push(this.createAirplane());
+                    this.robotPool.push(this.createRobot());
+                    this.explosionPool.push(this.createExplosion());
+                    this.destructionExplosionPool.push(this.createDestructionExplosion());
                 }
-            }, 1000);
-        }
+            }
 
-        function createExplosion(x, y) {
-            const explosion = document.createElement('div');
-            explosion.className = 'explosion active';
-            explosion.style.left = x + 'px';
-            explosion.style.top = y + 'px';
-            document.body.appendChild(explosion);
+            getFromPool(pool) {
+                return pool.find(obj => !obj.active) || null;
+            }
 
-            // Remove explosion element after animation
-            setTimeout(() => {
-                document.body.removeChild(explosion);
-            }, 600);
-        }
+            returnToPool(obj) {
+                obj.active = false;
+                obj.element.style.display = 'none';
+                obj.element.style.transform = '';
+                obj.element.className = obj.element.className.replace(/\s*(crashed|destroyed|active)\s*/g, ' ').trim();
+                
+                // Reset position to avoid memory leaks
+                obj.x = 0;
+                obj.y = 0;
+            }
 
-        function createDestructionExplosion(x, y) {
-            const explosion = document.createElement('div');
-            explosion.className = 'destruction-explosion active';
-            explosion.style.left = x + 'px';
-            explosion.style.top = y + 'px';
-            document.body.appendChild(explosion);
+            createAirplane() {
+                const airplane = document.createElement('div');
+                airplane.className = 'airplane moving-object';
+                airplane.style.display = 'none';
+                this.elements.cloudsContainer.appendChild(airplane);
+                
+                return {
+                    element: airplane,
+                    active: false,
+                    x: 0,
+                    y: 0,
+                    speed: 0,
+                    startTime: 0
+                };
+            }
 
-            // Remove explosion element after animation
-            setTimeout(() => {
-                document.body.removeChild(explosion);
-            }, 800);
-        }
+            createRobot() {
+                const robot = document.createElement('div');
+                robot.className = 'robot moving-object';
+                robot.style.display = 'none';
+                this.elements.cloudsContainer.appendChild(robot);
+                
+                return {
+                    element: robot,
+                    active: false,
+                    x: 0,
+                    y: 0,
+                    speed: 0,
+                    startTime: 0,
+                    waveOffset: Math.random() * Math.PI * 2
+                };
+            }
 
-        // Initialize eye position
-        updateEyePosition();
+            createExplosion() {
+                const explosion = document.createElement('div');
+                explosion.className = 'explosion';
+                explosion.style.display = 'none';
+                document.body.appendChild(explosion);
+                
+                return {
+                    element: explosion,
+                    active: false
+                };
+            }
 
-        // Robot spawning system
-        function spawnRobot() {
-            // Create new robot
-            const newRobot = document.createElement('div');
-            newRobot.className = 'robot';
-            
-            // Random vertical position between 30% and 80%
-            const randomTop = Math.random() * 50 + 30;
-            newRobot.style.top = randomTop + '%';
-            
-            document.querySelector('.clouds').appendChild(newRobot);
-            
-            // Remove robot after it crosses the screen (if not destroyed)
-            setTimeout(() => {
-                if (newRobot.parentNode && !newRobot.classList.contains('destroyed')) {
-                    newRobot.parentNode.removeChild(newRobot);
+            createDestructionExplosion() {
+                const explosion = document.createElement('div');
+                explosion.className = 'destruction-explosion';
+                explosion.style.display = 'none';
+                document.body.appendChild(explosion);
+                
+                return {
+                    element: explosion,
+                    active: false
+                };
+            }
+
+            // Optimized cloud management
+            initializeClouds() {
+                const clouds = document.querySelectorAll('.cloud');
+                clouds.forEach((cloud, index) => {
+                    this.activeClouds.add(cloud);
+                    this.cloudPositions.set(cloud, { x: -200, y: 0 });
+                    this.cloudSpeeds.set(cloud, 0.8 + Math.random() * 1.2); // Smoother speed between 0.8-2.0
+                    
+                    // Set initial position
+                    cloud.style.left = '-200px';
+                });
+            }
+
+            updateCloudBoundaries() {
+                // Update cloud movement boundaries when window resizes
+                this.windowWidth = window.innerWidth;
+            }
+
+            // Main game loop using requestAnimationFrame
+            startGameLoop() {
+                this.windowWidth = window.innerWidth;
+                this.gameLoop();
+            }
+
+            gameLoop(currentTime = 0) {
+                // Calculate FPS
+                if (currentTime - this.lastTime >= 1000) {
+                    this.fps = Math.round((this.frameCount * 1000) / (currentTime - this.lastTime));
+                    this.elements.fpsElement.textContent = `FPS: ${this.fps}`;
+                    this.frameCount = 0;
+                    this.lastTime = currentTime;
                 }
-            }, 3500); // Robot takes 3 seconds to cross + buffer
-        }
+                this.frameCount++;
 
-        function scheduleNextRobot() {
-            // Random delay between 10-15 seconds for next robot
-            const delay = Math.random() * 5000 + 10000;
-            setTimeout(() => {
-                spawnRobot();
-                scheduleNextRobot(); // Schedule the next one
-            }, delay);
-        }
+                // Update game objects
+                this.updateClouds();
+                this.updateAirplanes(currentTime);
+                this.updateRobots(currentTime);
 
-        // Start robot spawning after initial delay (10 seconds)
-        setTimeout(() => {
-            spawnRobot(); // Spawn first robot
-            scheduleNextRobot(); // Start the recurring schedule
-        }, 10000);
+                // Cleanup inactive objects periodically to prevent memory leaks
+                if (this.frameCount % 300 === 0) { // Every 5 seconds at 60fps
+                    this.cleanupInactiveObjects();
+                }
 
-        // Airplane spawning system
-        function spawnAirplanes() {
-            // Random number of airplanes to spawn (1-4)
-            const numAirplanes = Math.floor(Math.random() * 4) + 1;
-            
-            for (let i = 0; i < numAirplanes; i++) {
-                // Random delay for each airplane (0-2 seconds apart)
-                const delay = Math.random() * 2000;
+                // Continue loop
+                requestAnimationFrame(this.gameLoop.bind(this));
+            }
+
+            updateClouds() {
+                this.activeClouds.forEach(cloud => {
+                    if (cloud.classList.contains('vaporized')) return;
+                    
+                    const pos = this.cloudPositions.get(cloud);
+                    const speed = this.cloudSpeeds.get(cloud);
+                    
+                    pos.x += speed * 2.5; // Adjusted multiplier for smooth movement
+                    
+                    if (pos.x > this.windowWidth + 200) {
+                        pos.x = -200;
+                    }
+                    
+                    cloud.style.transform = `translateX(${pos.x}px)`;
+                });
+            }
+
+            updateAirplanes(currentTime) {
+                // Convert to array to avoid modification during iteration
+                const airplanesArray = Array.from(this.activeAirplanes);
+                
+                for (let i = airplanesArray.length - 1; i >= 0; i--) {
+                    const airplane = airplanesArray[i];
+                    if (!airplane.active) {
+                        this.activeAirplanes.delete(airplane);
+                        continue;
+                    }
+                    
+                    const elapsed = (currentTime - airplane.startTime) / 1000;
+                    airplane.x = elapsed * airplane.speed;
+                    
+                    if (airplane.x > this.windowWidth + 100) {
+                        this.activeAirplanes.delete(airplane);
+                        this.returnToPool(airplane);
+                        continue;
+                    }
+                    
+                    airplane.element.style.transform = `translateX(${airplane.x}px)`;
+                }
+            }
+
+            updateRobots(currentTime) {
+                // Convert to array to avoid modification during iteration
+                const robotsArray = Array.from(this.activeRobots);
+                
+                for (let i = robotsArray.length - 1; i >= 0; i--) {
+                    const robot = robotsArray[i];
+                    if (!robot.active) {
+                        this.activeRobots.delete(robot);
+                        continue;
+                    }
+                    
+                    const elapsed = (currentTime - robot.startTime) / 1000;
+                    robot.x = elapsed * robot.speed;
+                    
+                    if (robot.x > this.windowWidth + 100) {
+                        this.activeRobots.delete(robot);
+                        this.returnToPool(robot);
+                        continue;
+                    }
+                    
+                    // Wave motion - faster and more pronounced
+                    const waveY = Math.sin(elapsed * 4 + robot.waveOffset) * 40;
+                    robot.element.style.transform = `translate(${robot.x}px, ${waveY}px)`;
+                }
+            }
+
+            // Optimized spawning system
+            scheduleSpawning() {
+                // Airplane spawning - more frequent and challenging
+                const spawnAirplanes = () => {
+                    const numAirplanes = Math.floor(Math.random() * 4) + 1; // 1-4 airplanes
+                    
+                    for (let i = 0; i < numAirplanes; i++) {
+                        setTimeout(() => {
+                            this.spawnAirplane();
+                        }, i * 300); // Spawn faster (every 300ms instead of 500ms)
+                    }
+                    
+                    setTimeout(spawnAirplanes, 1500 + Math.random() * 3000); // More frequent spawning
+                };
+
+                // Robot spawning - more frequent for higher difficulty
+                const spawnRobots = () => {
+                    this.spawnRobot();
+                    setTimeout(spawnRobots, 8000 + Math.random() * 4000); // Spawn every 8-12 seconds instead of 10-15
+                };
+
+                // Start spawning - begin action sooner
+                setTimeout(spawnAirplanes, 500); // Start airplanes after 0.5 seconds
+                setTimeout(spawnRobots, 6000); // Start robots after 6 seconds instead of 10
+            }
+
+            spawnAirplane() {
+                const airplane = this.getFromPool(this.airplanePool);
+                if (!airplane) return;
+
+                airplane.active = true;
+                airplane.x = -80;
+                airplane.y = Math.random() * 80 + 10; // 10-90%
+                airplane.speed = 180 + Math.random() * 120; // Smoother: 180-300 pixels per second
+                airplane.startTime = performance.now();
+
+                airplane.element.style.display = 'block';
+                airplane.element.style.top = airplane.y + '%';
+                airplane.element.style.left = '-80px';
+                airplane.element.style.transform = 'translateX(0)';
+
+                this.activeAirplanes.add(airplane);
+            }
+
+            spawnRobot() {
+                const robot = this.getFromPool(this.robotPool);
+                if (!robot) return;
+
+                robot.active = true;
+                robot.x = -60;
+                robot.y = Math.random() * 50 + 30; // 30-80%
+                robot.speed = 120 + Math.random() * 80; // Balanced: 120-200 pixels per second
+                robot.startTime = performance.now();
+                robot.waveOffset = Math.random() * Math.PI * 2;
+
+                robot.element.style.display = 'block';
+                robot.element.style.top = robot.y + '%';
+                robot.element.style.left = '-60px';
+                robot.element.style.transform = 'translate(0, 0)';
+
+                this.activeRobots.add(robot);
+            }
+
+            // Optimized laser and collision system
+            fireLaser(targetX, targetY) {
+                // Prevent rapid firing to improve responsiveness
+                if (this.isLaserActive) return;
+                this.isLaserActive = true;
+
+                const pupilRect = document.querySelector('.pupil').getBoundingClientRect();
+                const pupilCenterX = pupilRect.left + pupilRect.width / 2;
+                const pupilCenterY = pupilRect.top + pupilRect.height / 2;
+
+                const deltaX = targetX - pupilCenterX;
+                const deltaY = targetY - pupilCenterY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const angle = Math.atan2(deltaY, deltaX) * (180 / Math.PI);
+
+                // Check collisions efficiently
+                this.checkCollisions(pupilCenterX, pupilCenterY, targetX, targetY);
+
+                // Render laser
+                this.elements.laser.style.left = pupilCenterX + 'px';
+                this.elements.laser.style.top = pupilCenterY + 'px';
+                this.elements.laser.style.height = distance + 'px';
+                this.elements.laser.style.transform = `rotate(${angle - 90}deg)`;
+                this.elements.laser.classList.add('active');
+
+                // Create explosion at target
+                this.createExplosionAt(targetX, targetY);
+
+                // Remove laser after animation and allow new firing
+                setTimeout(() => {
+                    this.elements.laser.classList.remove('active');
+                    this.isLaserActive = false;
+                }, 150); // Reduced from 300ms for better responsiveness
+            }
+
+            checkCollisions(startX, startY, endX, endY) {
+                // Check cloud collisions
+                const cloudsArray = Array.from(this.activeClouds);
+                for (const cloud of cloudsArray) {
+                    if (cloud.classList.contains('vaporized')) continue;
+                    
+                    const rect = cloud.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    if (this.isPointNearLine(startX, startY, endX, endY, centerX, centerY, 50)) {
+                        this.vaporizeCloud(cloud);
+                        this.createDestructionExplosionAt(centerX, centerY);
+                        break; // Only hit one target per shot for better performance
+                    }
+                }
+
+                // Check airplane collisions
+                const airplanesArray = Array.from(this.activeAirplanes);
+                for (const airplane of airplanesArray) {
+                    if (!airplane.active) continue;
+                    
+                    const rect = airplane.element.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    if (this.isPointNearLine(startX, startY, endX, endY, centerX, centerY, 40)) {
+                        this.crashAirplane(airplane);
+                        this.createDestructionExplosionAt(centerX, centerY);
+                        break; // Only hit one target per shot for better performance
+                    }
+                }
+
+                // Check robot collisions
+                const robotsArray = Array.from(this.activeRobots);
+                for (const robot of robotsArray) {
+                    if (!robot.active) continue;
+                    
+                    const rect = robot.element.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    
+                    if (this.isPointNearLine(startX, startY, endX, endY, centerX, centerY, 35)) {
+                        this.destroyRobot(robot);
+                        this.createDestructionExplosionAt(centerX, centerY);
+                        break; // Only hit one target per shot for better performance
+                    }
+                }
+            }
+
+            isPointNearLine(x1, y1, x2, y2, px, py, threshold) {
+                const A = px - x1;
+                const B = py - y1;
+                const C = x2 - x1;
+                const D = y2 - y1;
+
+                const dot = A * C + B * D;
+                const lenSq = C * C + D * D;
+                let param = -1;
+                if (lenSq !== 0) {
+                    param = dot / lenSq;
+                }
+
+                let xx, yy;
+                if (param < 0) {
+                    xx = x1;
+                    yy = y1;
+                } else if (param > 1) {
+                    xx = x2;
+                    yy = y2;
+                } else {
+                    xx = x1 + param * C;
+                    yy = y1 + param * D;
+                }
+
+                const dx = px - xx;
+                const dy = py - yy;
+                return Math.sqrt(dx * dx + dy * dy) < threshold;
+            }
+
+            vaporizeCloud(cloud) {
+                cloud.classList.add('vaporized');
+                this.updateScore(-1);
                 
                 setTimeout(() => {
-                    createAirplane();
-                }, delay);
+                    cloud.classList.remove('vaporized');
+                    this.cloudPositions.set(cloud, { x: -200, y: 0 });
+                }, 3000);
             }
-            
-            // Schedule next batch of airplanes with random interval (2-6 seconds)
-            const nextSpawnDelay = Math.random() * 4000 + 2000;
-            setTimeout(spawnAirplanes, nextSpawnDelay);
-        }
 
-        function createAirplane() {
-            const airplane = document.createElement('div');
-            airplane.className = 'airplane flying';
-            
-            // Random vertical position between 10% and 90%
-            const randomTop = Math.random() * 80 + 10;
-            airplane.style.top = randomTop + '%';
-            
-            // Random speed (2-5 seconds to cross screen)
-            const duration = Math.random() * 3 + 2;
-            airplane.style.animationDuration = duration + 's';
-            
-            document.querySelector('.clouds').appendChild(airplane);
-            
-            // Remove airplane after it crosses the screen
-            setTimeout(() => {
-                if (airplane.parentNode && !airplane.classList.contains('crashed')) {
-                    airplane.parentNode.removeChild(airplane);
+            crashAirplane(airplane) {
+                airplane.element.classList.add('crashed');
+                this.activeAirplanes.delete(airplane);
+                this.updateScore(1);
+                
+                setTimeout(() => {
+                    this.returnToPool(airplane);
+                }, 1000);
+            }
+
+            destroyRobot(robot) {
+                robot.element.classList.add('destroyed');
+                this.activeRobots.delete(robot);
+                this.updateScore(3);
+                
+                setTimeout(() => {
+                    this.returnToPool(robot);
+                }, 1000);
+            }
+
+            createExplosionAt(x, y) {
+                const explosion = this.getFromPool(this.explosionPool);
+                if (!explosion) return;
+
+                explosion.active = true;
+                explosion.element.style.display = 'block';
+                explosion.element.style.left = x + 'px';
+                explosion.element.style.top = y + 'px';
+                explosion.element.classList.add('active');
+
+                setTimeout(() => {
+                    explosion.element.classList.remove('active');
+                    this.returnToPool(explosion);
+                }, 600);
+            }
+
+            createDestructionExplosionAt(x, y) {
+                const explosion = this.getFromPool(this.destructionExplosionPool);
+                if (!explosion) return;
+
+                explosion.active = true;
+                explosion.element.style.display = 'block';
+                explosion.element.style.left = x + 'px';
+                explosion.element.style.top = y + 'px';
+                explosion.element.classList.add('active');
+
+                setTimeout(() => {
+                    explosion.element.classList.remove('active');
+                    this.returnToPool(explosion);
+                }, 800);
+            }
+
+            updateScore(points) {
+                this.score += points;
+                this.elements.scoreElement.textContent = `Score: ${this.score}`;
+            }
+
+            cleanupInactiveObjects() {
+                // Clean up inactive airplanes
+                this.activeAirplanes.forEach(airplane => {
+                    if (!airplane.active) {
+                        this.activeAirplanes.delete(airplane);
+                    }
+                });
+
+                // Clean up inactive robots
+                this.activeRobots.forEach(robot => {
+                    if (!robot.active) {
+                        this.activeRobots.delete(robot);
+                    }
+                });
+
+                // Reset object pools if they get too large
+                if (this.airplanePool.length > 20) {
+                    this.airplanePool = this.airplanePool.slice(0, 10);
                 }
-            }, duration * 1000 + 1000);
+                if (this.robotPool.length > 20) {
+                    this.robotPool = this.robotPool.slice(0, 10);
+                }
+                if (this.explosionPool.length > 30) {
+                    this.explosionPool = this.explosionPool.slice(0, 15);
+                }
+                if (this.destructionExplosionPool.length > 30) {
+                    this.destructionExplosionPool = this.destructionExplosionPool.slice(0, 15);
+                }
+            }
         }
 
-        // Start airplane spawning immediately
-        spawnAirplanes();
+        // Initialize the optimized game
+        document.addEventListener('DOMContentLoaded', () => {
+            new OptimizedGame();
+        });
     </script>
 </body>
 </html>
